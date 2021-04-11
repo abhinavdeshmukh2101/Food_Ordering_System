@@ -45,7 +45,6 @@ public class Customer1 {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage("C:\\Users\\bhakt\\eclipse-workspace\\java_Practise\\src\\Images\\Food.jpeg"));
 		frame.getContentPane().setBackground(new Color(255, 215, 0));
 		frame.getContentPane().setForeground(new Color(255, 255, 255));
 		frame.setBounds(100, 100, 825, 557);
@@ -64,6 +63,8 @@ public class Customer1 {
 		btnNewButton.setForeground(new Color(255, 255, 255));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				new Food_menu_starters();
+				Food_menu_starters.NewScreen();
 			}
 		});
 		btnNewButton.setBackground(new Color(220, 20, 60));
@@ -73,6 +74,7 @@ public class Customer1 {
 		JButton btnNewButton_1 = new JButton("Snacks");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 			}
 		});
 		btnNewButton_1.setBounds(222, 291, 175, 57);
