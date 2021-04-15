@@ -67,13 +67,7 @@ public class Food_order extends JFrame {
 		initialize();
 	}
 	
-	private void display_orders() {
-		for(int i=0;i<20;i++) {
-			data[i][0] = i+1;
-			data[i][1] = order_table[i][1];
-			data[i][2] = order_table[i][2];
-		}
-	}
+	
 	
 	private void update_tbl_no(String order) {
 		data[current_row][1] = Integer.parseInt(order.substring(0,1));
