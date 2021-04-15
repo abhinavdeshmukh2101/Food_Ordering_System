@@ -1,5 +1,3 @@
-package java_Practise;
-
 import java.awt.*;
 
 import javax.swing.*;
@@ -12,6 +10,10 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.SoftBevelBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 
 
@@ -47,6 +49,7 @@ public class Food_menu_starters extends JFrame {
 	/**
 	 * Initialize the contents of the frame.
 	 */
+	
 	private void initialize() {
 		setBounds(100, 100, 513, 461);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -56,15 +59,31 @@ public class Food_menu_starters extends JFrame {
 		panel_1.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		panel_1.setBackground(new Color(233, 150, 122));
 		panel_1.setBounds(10, 10, 481, 404);
+		
 
 		Object[][] data= new Object[20][3] ;
 		String [] column = {"No.","Starters","Price"};
-		data[0][0]= 1;
-		data[0][1]="Pav Bhaji";
-		data[0][2]= 100;
-		data[1][0]=2;
-		data[1][1]="Noodles";
-		data[1][2]= 100;
+		
+		// reads starters from menu the data from server.
+		
+		try {
+	    	Class.forName("com.mysql.cj.jdbc.Driver");  
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/starters","root","Deshmukh@1");    
+			Statement stmt = con.createStatement(); 
+			
+			ResultSet rs = stmt.executeQuery("Select * from starters");
+			
+			for(int i=0;rs.next();i++) {
+				data[i][0] = i+1;
+				data[i][1] = rs.getString(1);  // will store item
+				data[i][2] = rs.getInt(2); 	   // will store the corresponding price.
+			}
+	     }
+	     catch(Exception e1) {
+	    	 System.out.println(e1);
+	     }
+		
+		
 		DefaultTableModel Model = new DefaultTableModel(data,column);
 		final JTable t1 = new JTable(Model);
 		t1.addMouseListener(new MouseAdapter() {
@@ -72,8 +91,23 @@ public class Food_menu_starters extends JFrame {
 			public void mouseClicked(MouseEvent e) {
 		     int index = t1.getSelectedRow();
 		     TableModel model = t1.getModel();
+		     int t_no = Integer.parseInt(JOptionPane.showInputDialog("Order for which Table number"));
 		     int quantity = Integer.parseInt(JOptionPane.showInputDialog("Enter quantity"));
+		    
 		     
+		     // sending data to database.
+		     
+		     try {
+		    	 Class.forName("com.mysql.cj.jdbc.Driver");  
+				Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/orders","root","Deshmukh@1");    
+				Statement stmt = con.createStatement(); 
+				
+				String query = "INSERT INTO orders (t_no,item,qty) " + "VALUES(+" + t_no + "," +data[index][1]+","+quantity+");";
+				stmt.executeQuery(query); 
+		     }
+		     catch(Exception e1) {
+		    	 System.out.println(e1);
+		     }
 			}
 		});
 		t1.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
@@ -99,10 +133,10 @@ public class Food_menu_starters extends JFrame {
 		panel_1.add(p);
 		getContentPane().add(panel_1);
 		
-		JButton btnNewButton = new JButton("Submit");
-		btnNewButton.setBackground(new Color(127, 255, 0));
-		btnNewButton.setFont(new Font("Goudy Old Style", Font.BOLD, 23));
-		btnNewButton.setBounds(158, 354, 144, 40);
-		panel_1.add(btnNewButton);
+		JButton submitbtn = new JButton("Submit");
+		submitbtn.setBackground(new Color(127, 255, 0));
+		submitbtn.setFont(new Font("Goudy Old Style", Font.BOLD, 23));
+		submitbtn.setBounds(158, 354, 144, 40);
+		panel_1.add(submitbtn);
 	}
 }
