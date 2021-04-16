@@ -35,7 +35,7 @@ import java.sql.Statement;
 public class Food_menu_starters extends JFrame {
 	private JScrollPane p;
 	private static final String SERVER_IP = "127.0.0.1";
-	private static final int SERVER_PORT = 5500;
+	private static final int SERVER_PORT = 9999;
 	String all_order = "";
 	int total_items=0,index,quantity;
 	private static int t_no;
@@ -89,15 +89,15 @@ public class Food_menu_starters extends JFrame {
 		
 		try {
 	    	Class.forName("com.mysql.cj.jdbc.Driver");  
-			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/starters","root","Deshmukh@1");    
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/menu_table","root","Deshmukh@1");    
 			Statement stmt = con.createStatement(); 
 			
-			ResultSet rs = stmt.executeQuery("Select * from starters");
+			ResultSet rs = stmt.executeQuery("Select * from menu_table where type= 's'");
 			
 			for(int i=0;rs.next();i++) {
-				data[i][0] = rs.getString(1);
-				data[i][1] = rs.getString(2);  
-				data[i][2] = rs.getInt(3); 	   
+				data[i][0] = rs.getString(1);  // id
+				data[i][1] = rs.getString(2);  // item name
+				data[i][2] = rs.getInt(4); 	   // price
 			}
 	     }
 	     catch(Exception e1) {
@@ -115,13 +115,11 @@ public class Food_menu_starters extends JFrame {
 		};
 		
 		all_order = "";  // make sure the string comes empty before taking the order.
-		all_order = "starters";
 		
 		t1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 			     index = t1.getSelectedRow();
-			     TableModel model = t1.getModel();
 			     quantity = Integer.parseInt(JOptionPane.showInputDialog("Enter quantity"));
 			     System.out.println("adding...");
 			     all_order = all_order +  data[index][0].toString() + Integer.toString(quantity);
@@ -172,7 +170,6 @@ public class Food_menu_starters extends JFrame {
 			        os.write(all_order);  // data sent to server 	
 			        os.flush();
 			        socket.close();
-					
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
