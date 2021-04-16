@@ -32,11 +32,9 @@ import java.net.Socket;
 
 public class Food_order extends JFrame {
 	
-	private static final int SERVER_PORT = 5500;
+	private static final int SERVER_PORT = 9999;
 	private int current_row = 0;
-	Object[][] data;
 	Object[][] order_table;
-	private String menu;
 	int total_items;
 	
 	public static void main(String[] args) {
@@ -54,7 +52,7 @@ public class Food_order extends JFrame {
 
 	/**
 	 * Create the application.
-	 */
+	 **/
 	
 	
 	public Food_order() {
@@ -67,61 +65,104 @@ public class Food_order extends JFrame {
 		initialize();
 	}
 	
-	
-	
-	private void update_tbl_no(String order) {
-		data[current_row][1] = Integer.parseInt(order.substring(0,1));
-		current_row++;
-	}
-	
-	private void temp_storage(String order) {
-		
-		order_table = new Object[20][3];  // temporary storage of order.
-    	
-    	if(order.contains("starters")) {
-    		menu = "starters";
-    		order.replace("starters", "");
-    	}
-    	else if(order.contains("main course")) {
-    		menu = "main course";
-    		order.replace("main course", "");
-    	}
-    	else if(order.contains("snacks")) {
-    		menu = "snacks";
-    		order.replace("snacks", "");
-    	}
-    	else if(order.contains("dessert")) {
-    		menu = "dessert";
-    		order.replace("dessert","");
-    	}
-    	
-    	try {
+	private void update_into_pending_order(StringBuffer order) {
+		try {
     	   	Class.forName("com.mysql.cj.jdbc.Driver");  
-    	   	Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/" + menu ,"root","Deshmukh@1");  
+    	   	Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/menu_table","root","Deshmukh@1");
+    	   	Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/pending_order","root","Deshmukh@1");
+    	   	// System.out.println("connected to database");  
     	   	Statement stmt = con.createStatement();
-    	   	String sql = "select * from "+menu;
-    	   	ResultSet rs = stmt.executeQuery(sql);
+    	   	String sql;
+    	   	String sql1;
+    	   	ResultSet rs = null;
     	   	
-    	   	int i = 1;
-    	   	while(order != "") {
-    	   		String item_id = order.substring(0,2);
-    	   		int q = Integer.parseInt(order.substring(2,3));
+    	   	int t_no = Integer.parseInt(order.substring(0,1));
+    	   	order.delete(0, 2);
+    	   	while(order.length()>0) {
+    	   		System.out.println(order);
+    	   		String item_id = order.substring(0,2).toString();
+    	   		order.delete(0,2);
     	   		
-    	   		while(rs.next()) {
-        	   		if(rs.getString("id") == item_id) {
-        	   			order_table[i-1][0] = i;
-        	   			order_table[i-1][1] = rs.getString("item");
-        	   			order_table[i-1][2] = q;
-        	   		}
-        	   	}
+    	   		System.out.println(order);
+    	   		int q = Integer.parseInt(order.substring(0,1));
+    	   		order.delete(0,1);
     	   		
-    	   		order.replace(order.substring(0,3), "");
+    	   		System.out.printf(item_id + " " + q+"\n");
+    	   		
+    	   		sql = "select * from menu_table where id =" + "'" + item_id + "'";
+    	   		
+    	   		rs = stmt.executeQuery(sql);
+    	   		
+    	   		System.out.println("doing\n");
+    	   		
+    	   		if(rs.next()) {
+    	   			System.out.println("updating...");
+    	   			sql1 = "insert into pending_order values(?,?,?,?)";
+    	   			PreparedStatement stmt1 = con1.prepareStatement(sql1);
+    	   			stmt1.setInt(1, t_no);
+    	   			stmt1.setString(2, rs.getString("food_name"));
+    	   			stmt1.setInt(3, rs.getInt("price"));
+    	   			stmt1.setInt(4, q);
+    	   			stmt1.executeUpdate();
+    	   		}
+    	   		System.out.println("updated!");
     	   	}
     	}
     	catch(Exception e1) {
     		 	System.out.println(e1);
     	}
 	}
+	
+//	private void display_orders() {
+//		for(int i=0;i<20;i++) {
+//			data[i][0] = i+1;
+//			data[i][1] = order_table[i][1];
+//			data[i][2] = order_table[i][2];
+//		}
+//	}
+	
+	private void update_tbl_no(StringBuffer order,Object[][] data) {
+		data[current_row][1] = Integer.parseInt(order.substring(0,1));
+		current_row++;
+	}
+	
+//	private void temp_storage(StringBuffer order) {
+//		
+//		order_table = new Object[20][3];  // temporary storage of order.
+//    	
+//    	try {
+//    	   	Class.forName("com.mysql.cj.jdbc.Driver");  
+//    	   	Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/menu_table","root","Deshmukh@1");  
+//    	   	Statement stmt = con.createStatement();
+//    	   	
+//    	   	
+//    	   	while(order.length() > 0) {
+//    	   		String item_id = order.substring(0,2).toString();
+//    	   		order.delete(0,2);
+//    	   		int q = Integer.parseInt(order.substring(0,1));
+//    	   		order.delete(0,1);
+//    	   		
+//    	   		System.out.printf(item_id + " " + q+"\n");
+//    	   		
+//    	   		String sql = "select * from menu_table where id="+item_id;
+//        	   	ResultSet rs = stmt.executeQuery(sql);
+//    	   		
+//    	   		System.out.println("doing\n");
+//    	   		
+//    	   		if(rs != null) {
+//    	   			sql = "insert into orders values(?,?,?)";
+//    	   			PreparedStatement statement = con.prepareStatement(sql);
+//    	   			//statement.setInt(1, t_no);
+//    	   			statement.setString(2, rs.getString("item"));
+//    	   			statement.setInt(3, q);
+//    	   		}
+//    	   	}
+//    	   	con.close();
+//    	}
+//    	catch(Exception e1) {
+//    		 	System.out.println(e1);
+//    	}
+//	}
 
 	/**
 	 * Initialize the contents of the frame.
@@ -211,8 +252,8 @@ public class Food_order extends JFrame {
        
 			
 		// table on right panel
-		data= new Object[20][2] ;
-		String [] column = {"No.","Table Number"};
+		Object[][] data= new Object[20][2] ;
+		String [] column = {"Sr.No","Table Number"};
 
 		
 //		data[0][0]=1;
@@ -278,17 +319,22 @@ public class Food_order extends JFrame {
 	    	BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	    	String order = br.readLine();
 	    	
+	    	
 	    	System.out.println("Client order: " + order);
 	    	
 	    	//update table no.
-	    	update_tbl_no(order);
-	    	order.replace(order.substring(0,1), "");
-	    	total_items = Integer.parseInt(order.substring(0,1));
-	    	order.replace(order.substring(0,1), "");
-
-	    	temp_storage(order);   // temporary storage of order in order_table variable.	
+	    	StringBuffer or = new StringBuffer(order);
+	    	StringBuffer or1 = new StringBuffer(order);
 	    	
-	    	display_orders();
+	    	update_into_pending_order(or);
+	    	
+	    	update_tbl_no(or1,data);
+	    	or1.delete(0,1);
+	    	
+	    	total_items = Integer.parseInt(or1.substring(0,1));
+	    	or1.delete(0,1);
+	    	
+//	    	display_orders();
 	    	
 	    	listener.close();
 	    	socket.close();
