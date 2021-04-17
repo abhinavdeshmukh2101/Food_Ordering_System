@@ -35,7 +35,7 @@ import java.sql.Statement;
 public class Food_menu_starters extends JFrame {
 	private JScrollPane p;
 	private static final String SERVER_IP = "127.0.0.1";
-	private static final int SERVER_PORT = 9999;
+	private static final int SERVER_PORT = 9905;
 	String all_order = "";
 	int total_items=0,index,quantity;
 	private static int t_no;
