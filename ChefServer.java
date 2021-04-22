@@ -1,3 +1,5 @@
+package java_Practise;
+
 import java.awt.*;
 import java.sql.*;
 import javax.swing.*;
@@ -18,7 +20,7 @@ import java.net.Socket;
 
 
 public class ChefServer extends JFrame {
-	
+
 	private static final int SERVER_PORT1 = 9904;
 	private int current_row = 0;
 	Object[][] data=new Object[20][2];
@@ -26,14 +28,14 @@ public class ChefServer extends JFrame {
 	Object[][] data2= new Object[20][2] ;
 	Object[][] data3= new Object[20][4] ;
 	String [] column = {"Sr.No","Table Number"};
-	String [] column1 = {"Sr.No","Ordered Table","Quantity"};
+	String [] column1 = {"Sr.No","Ordered Item","Quantity"};
 	String [] column2 = {"Sr.no.","Table"};
 	String [] column3 = {"Food Item","quantity","Price","Total"};
 	DefaultTableModel Model,Model1,Model2,Model3;
 	int billing_n=0;
 	int total_items,table_no=0;
 	StringBuffer orderc= new StringBuffer("");
-	
+
 	public static void main(String[] args) {
 
 				try {
@@ -42,7 +44,7 @@ public class ChefServer extends JFrame {
 					while(true) {
 						jf.runsocket();
 					}
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -59,19 +61,19 @@ public class ChefServer extends JFrame {
 		setTitle("Annas Cafe");
 		getContentPane().setBackground(Color.GRAY);
 		initialize();
-		
+
 	}
-	
+
 	private Object[][] update_chef_order_table(Object [][]temp) {
 		try {
-	    	Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15");
+	    	Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001");
     	   	 System.out.println("connected to database");  
     	   	Statement stmt = con1.createStatement();
     	   	String sql = "Select * from orders";
     	   	ResultSet rs = null;
-    	   	
+
     	   	rs = stmt.executeQuery(sql);
-    	   	
+
     	   	int i=0;
     	   	while(rs.next()) {
     	   		if(rs.getInt(1) == table_no) {
@@ -84,43 +86,43 @@ public class ChefServer extends JFrame {
     	   		}
     	   	}
     	   	con1.close();
-    	 
+
 	    }
 	    catch(Exception e1) {
 	    	System.out.println(e1);
 	    }
 		return temp;
 	}
-	
+
 	private void update_into_pending_order(StringBuffer order) {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver"); 
-    	   	Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15");
-    	   	Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15"); 
+    	   	Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001");
+    	   	Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001"); 
     	   	Statement stmt = con.createStatement();
     	   	String sql;
     	   	String sql1;
     	   	ResultSet rs = null;
-    	   	
+
     	   	int t_no = Integer.parseInt(order.substring(0,1));
     	   	order.delete(0, 2);
     	   	while(order.length()>0) {
     	   		System.out.println(order);
     	   		String item_id = order.substring(0,2).toString();
     	   		order.delete(0,2);
-    	   		
+
     	   		System.out.println(order);
     	   		int q = Integer.parseInt(order.substring(0,1));
     	   		order.delete(0,1);
-    	   		
+
     	   		System.out.printf(item_id + " " + q+"\n");
-    	   		
+
     	   		sql = "select * from menu where id =" + "'" + item_id + "'";
-    	   		
+
     	   		rs = stmt.executeQuery(sql);
-    	   		
+
     	   		System.out.println("doing\n");
-    	   		
+
     	   		if(rs.next()) {
     	   			System.out.println("updating...");
     	   			sql1 = "insert into orders(t_no,food_item,price,q) values(?,?,?,?)";
@@ -139,11 +141,11 @@ public class ChefServer extends JFrame {
     		 	System.out.println(e1);
     	}
 	}
-	
-	
+
+
 	private void update_into_accepted_order() {
 		try {
-			Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15");
+			Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001");
 			System.out.println("connected to database");  
 			Statement st = con1.createStatement();
 			  //Copy table
@@ -162,7 +164,7 @@ public class ChefServer extends JFrame {
 	}
 	private void delete_from_pending_order() {
 		try {
-			Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15");
+			Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001");
 			System.out.println("connected to database");  
 			Statement st = con1.createStatement();
 			  //Copy table
@@ -195,7 +197,7 @@ public class ChefServer extends JFrame {
 			   if(mark==1) current_row-=mark;
 		       return temp;
 		}
-	
+
 			//Updating table content(Removing accpeted order from the list)
 	private Object[][] update_tbl_no(int tn,Object[][] data) {
 	        int mark =0;
@@ -220,11 +222,11 @@ public class ChefServer extends JFrame {
 		try {
 	    	System.out.println("SERVER - started!!");
 	    	ServerSocket listener1 = new ServerSocket(SERVER_PORT1);
-	    	
+
 	    	System.out.println("SERVER - waiting for client connection...");
 	    	Socket socket = listener1.accept();   // single socket
 	    	System.out.println("SERVER - connected to client!");
-	    	
+
 	    	BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 	    	String order = br.readLine();
 	    	System.out.println("Client order pre: " + order);
@@ -240,11 +242,11 @@ public class ChefServer extends JFrame {
 		    	System.out.println("Client order: " + order);
 		    	StringBuffer or = new StringBuffer(order);
 		    	StringBuffer or1 = new StringBuffer(order);
-		    	
+
 		    	update_into_pending_order(or); //Update into mysql database
 		    	int tablen=Integer.parseInt(or1.substring(0,1));//get the table number from string
 		        data =update_tbl_no(tablen,data);
-		    	
+
 		        Model1.setDataVector(data, column);
 			    Model1.fireTableDataChanged(); //Change the JTable content for prnding list
 		       	total_items = tablen;
@@ -252,12 +254,12 @@ public class ChefServer extends JFrame {
 	    	listener1.close();
 	    	socket.close();
 	    	System.out.println("socket is closed!!");
-	    	
+
 	    }
 	    catch(Exception e1) {
 	    	System.out.println(e1);
 	    }
-	
+
 	}
 private void billing() { //TO When Customer generates a bill ,bill will  appear here.
 	    JFrame jfb = new JFrame();
@@ -270,17 +272,17 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 		jfb.setBounds(100, 100, 835, 400);
 		jfb.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		jfb.getContentPane().setLayout(null);
-		
+
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		panel_1.setBackground(new Color(192, 192, 192));
 		panel_1.setBounds(20, 21, 322, 320);
 
-		
-		
+
+
 		panel_1.setLayout(null);
 		jfb.getContentPane().add(panel_1);
-		JTable t1 = new JTable(Model2);
+		final JTable t1 = new JTable(Model2);
 		t1.setFont(new Font("Arial Black", Font.BOLD, 12));
 		t1.setRowHeight(20);
 		t1.setToolTipText("Accepted order");
@@ -291,22 +293,22 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 		t1.setBorder(new LineBorder(new Color(0, 0, 0), 2, true));
 		t1.setBackground(new Color(173, 255, 47));
 		t1.addPropertyChangeListener(getName(), null);
-	    
-	
+
+
 		JScrollPane p1 = new JScrollPane(t1);
 		p1.setBounds(30, 23, 265, 275);
 		panel_1.add(p1);
 		p1.setBorder(new CompoundBorder());
-		
-		
-		
-		
+
+
+
+
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		panel_2.setBackground(new Color(192, 192, 192));
 		panel_2.setBounds(382, 21, 413, 320);
-		
-		
+
+
 		Model3 = new DefaultTableModel(data3,column3);
 		panel_2.setLayout(null);
 		jfb.getContentPane().add(panel_2);
@@ -325,12 +327,12 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 		tc2.setMinWidth(130);
 		tc2.setMaxWidth(130);
 		tc2.setPreferredWidth(130);
-		
+
 			JScrollPane p2 = new JScrollPane(t2);
 			p2.setBounds(39, 24, 341, 243);
 			panel_2.add(p2);
 			p2.setBorder(new CompoundBorder());
-			
+
 			JButton btnNewButton = new JButton("Done");
 			btnNewButton.setForeground(Color.BLACK);
 			btnNewButton.setBackground(Color.YELLOW);
@@ -340,10 +342,10 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-							Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15");
+							Connection con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001");
 							System.out.println("connected to database");  
 							Statement st = con1.createStatement();
-						  
+
 						    int rows = st.executeUpdate("DELETE FROM accepted_order where t_no = " + "'" + table_no + "'");
 						    if (rows > 0){
 						         System.out.println("Data Deleted Successfully");
@@ -375,7 +377,7 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 					data3 = temp1;
 				    Model3.setDataVector(temp1, column3); //Clearing the Bill Table
 				    Model3.fireTableDataChanged();
-					
+
 				}
 			});
 			panel_2.add(btnNewButton);
@@ -383,15 +385,15 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 			t1.addMouseListener(new MouseAdapter() {//Getting the Bill Details from the Mysql Database
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					
+
 				    int index = t1.getSelectedRow();
 				    table_no = (int) data2[index][1];
 				    Object [][] temp = new Object[20][4];
 				    try {
 						Class.forName("com.mysql.cj.jdbc.Driver");
-						Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_order","root","Rohitgd@15");    
+						Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/food_ordering_system","root","bhakti11052001");    
 						Statement stmt = con.createStatement(); 
-					
+
 						int i=0,total_amount=0;
 						String sql = "Select * from accepted_order where t_no ='"+table_no+"'";
 						ResultSet rs = stmt.executeQuery(sql);
@@ -403,7 +405,7 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 							total_amount +=rs.getInt(4)*rs.getInt(3);
 							i++;
 						}
-							
+
 						temp[i+2][0]="Total";
 						temp[i+2][3]=total_amount;
 						data3=temp;
@@ -412,17 +414,17 @@ private void billing() { //TO When Customer generates a bill ,bill will  appear 
 					} catch ( SQLException | ClassNotFoundException e1) {
 						e1.printStackTrace();
 					}
-					
+
 				}
 			});
 }
 private void initialize() {
-		
+
 	    Model2 = new DefaultTableModel(data2,column2);
 		setBounds(500,400, 835, 400);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(null);
-		
+
 		// top panel.
 		JPanel panel = new JPanel();
 		panel.setBorder(new CompoundBorder(new LineBorder(new Color(0, 0, 0), 1, true), new BevelBorder(BevelBorder.RAISED, null, null, null, null)));
@@ -430,9 +432,9 @@ private void initialize() {
 		panel.setBounds(0, 0, 821, 40);
 		getContentPane().add(panel);
 		panel.setLayout(null);
-		
 
-		
+
+
 		JButton btnNewButton_1 = new JButton("Billing");
 		btnNewButton_1.setBackground(new Color(152, 251, 152));
 		btnNewButton_1.setBorder(new CompoundBorder(new LineBorder(new Color(0, 0, 0), 1, true), new BevelBorder(BevelBorder.RAISED, null, null, null, null)));
@@ -444,26 +446,26 @@ private void initialize() {
 			}
 		});
 		panel.add(btnNewButton_1);
-		
+
 		//left panel
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		panel_1.setBounds(10, 50, 230, 303);
+		panel_1.setBounds(29, 61, 363, 277);
 		getContentPane().add(panel_1);
 		panel_1.setLayout(null);
-		
-		
+
+
 		//right panel
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		panel_2.setBackground(new Color(192, 192, 192));
-		panel_2.setBounds(270, 62, 528, 277);
-			
+		panel_2.setBounds(429, 62, 369, 277);
+
 		// table on right panel
-		
+
 		Model1 = new DefaultTableModel(data,column);
 		final JTable t1 = new JTable(Model1);
-		
+
 		t1.setFont(new Font("Arial Black", Font.BOLD, 12));
 		t1.setRowHeight(20);
 		t1.setToolTipText("Recent Orders");
@@ -475,22 +477,21 @@ private void initialize() {
 		t1.setBackground(new Color(173, 255, 47));
 		t1.addPropertyChangeListener(getName(), null);
 		TableColumn tc1 = t1.getColumnModel().getColumn(0);
-		tc1.setMinWidth(30);
-		tc1.setMaxWidth(30);
+		
 		tc1.setPreferredWidth(30);
 		panel_2.setLayout(null);
-	
+
 		JScrollPane p = new JScrollPane(t1);
 		p.setBorder(new CompoundBorder());
-		p.setBounds(41, 29, 452,300);
+		p.setBounds(35, 23, 307,232);
 		panel_2.add(p);
 		getContentPane().add(panel_2);
-		
-		
-		
+
+
+
 		Model = new DefaultTableModel(update_chef_order_table(data1),column1);
 		JTable t2 = new JTable(Model) ;
-		
+
 		t2.setFont(new Font("Goudy Old Style", Font.BOLD, 18));
 		t2.setRowHeight(20);
 		t2.setToolTipText("Ordered Items");
@@ -508,14 +509,14 @@ private void initialize() {
 		tc02.setPreferredWidth(150);
 		tc03.setPreferredWidth(5);
 		panel_1.setLayout(null);
-		
+
 		final JScrollPane p1 = new JScrollPane(t2);
 		p1.setBorder(new CompoundBorder());
-		p1.setBounds(0, 0, 230, 249);
+		p1.setBounds(20, 10, 322, 229);
 		panel_1.add(p1);
 		getContentPane().add(panel_1);
-		
-		
+
+
 		JButton btnNewButton_2 = new JButton("Accept Order");
 		btnNewButton_2.setForeground(new Color(0, 0, 0));
 		btnNewButton_2.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -523,7 +524,7 @@ private void initialize() {
 		btnNewButton_2.addActionListener(new ActionListener() {//After accepting order detail will be sent to Accepted order. 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				update_into_accepted_order();
 				delete_from_pending_order();
 				Object [][] temp = new Object[50][3];
@@ -533,13 +534,13 @@ private void initialize() {
 			    data1=temp;
 			    Model.setDataVector(data1, column1);
 			    Model.fireTableDataChanged();
-				
+
 			}
 		});
-		btnNewButton_2.setBounds(44, 259, 136, 34);
+		btnNewButton_2.setBounds(105, 243, 136, 24);
 		panel_1.add(btnNewButton_2);
         p1.setVisible(false);    // will be visible is table1 button is click.
-        
+
         // for displaying the order in server table
 		t1.addMouseListener(new MouseAdapter() {
 			@Override
@@ -553,6 +554,6 @@ private void initialize() {
 			    Model.fireTableDataChanged();
 			}
 		});	
-		
+
 	}
-}
+} 
